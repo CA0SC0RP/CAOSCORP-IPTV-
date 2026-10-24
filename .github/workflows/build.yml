@@ -1,0 +1,51 @@
+name: Compilar APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Compilar APK (debug)
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: Poner nombre fijo al APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk CAOS-TV.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CAOS-TV-apk
+          path: CAOS-TV.apk
+
+      - name: Mover la etiqueta "latest" a este commit
+        run: |
+          git tag -f latest
+          git push -f origin latest
+
+      - name: Publicar en Releases (enlace fijo)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Última versión (build ${{ github.run_number }})"
+          prerelease: true
+          files: CAOS-TV.apk
+          body: "APK de debug generado automáticamente del commit ${{ github.sha }}."
