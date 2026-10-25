@@ -3,22 +3,17 @@ import { AccountStore } from './data/accountStore';
 import { ChannelRepository } from './data/channelRepository';
 import { CosmicGateway } from './ui/CosmicGateway';
 import { CyberNavbar } from './components/CyberNavbar';
-import { CosmicDiscoGlobe } from './components/CosmicDiscoGlobe';
-import { CosmicPlanetaryCarousel } from './components/CosmicPlanetaryCarousel';
+import { PhotoClotheslineView } from './components/PhotoClotheslineView';
 import { TiviMateLiveTvView } from './ui/TiviMateLiveTvView';
 import { CleanFullscreenPlayer } from './ui/CleanFullscreenPlayer';
-import { Channel } from './data/models';
 
 type MainSection = 'movies' | 'series' | 'live';
-type ViewMode = 'disco' | 'planet';
 
 export const App: React.FC = () => {
   // If account is loaded -> 'app', else -> 'gateway'
   const [appState, setAppState] = useState<'gateway' | 'app'>('gateway');
   // Default first section is 'movies' (Películas) as requested!
   const [currentTab, setCurrentTab] = useState<MainSection>('movies');
-  // Default 3D visualization: 'disco' (Bola de disco con cuadritos facetados)
-  const [viewMode, setViewMode] = useState<ViewMode>('disco');
   const [initializing, setInitializing] = useState<boolean>(true);
 
   // Fullscreen player state
@@ -75,7 +70,7 @@ export const App: React.FC = () => {
           INICIANDO CAOSCORP...
         </h2>
         <p className="text-xs text-[#8592A6] mt-1 font-mono tracking-wider">
-          Sincronizando Sistema IPTV Holográfico 3D
+          Sincronizando Sistema IPTV Holográfico
         </p>
       </div>
     );
@@ -115,44 +110,26 @@ export const App: React.FC = () => {
         onSelectTab={(tab) => setCurrentTab(tab)}
         onOpenLogin={() => setAppState('gateway')}
         accountInfo={ChannelRepository.accountInfo}
-        viewMode={viewMode}
-        onToggleViewMode={() =>
-          setViewMode((prev) => (prev === 'disco' ? 'planet' : 'disco'))
-        }
       />
 
       {/* Main Section Content */}
       <main className="flex-1 relative overflow-hidden">
         {currentTab === 'movies' && (
-          viewMode === 'disco' ? (
-            <CosmicDiscoGlobe
-              items={ChannelRepository.movies}
-              type="movies"
-              onPlayItem={(title, url) => handleOpenPlayer(title, url)}
-            />
-          ) : (
-            <CosmicPlanetaryCarousel
-              items={ChannelRepository.movies}
-              type="movies"
-              onPlayItem={(title, url) => handleOpenPlayer(title, url)}
-            />
-          )
+          <PhotoClotheslineView
+            type="movies"
+            items={ChannelRepository.movies}
+            categories={ChannelRepository.movieCategories}
+            onPlayItem={(title, url) => handleOpenPlayer(title, url)}
+          />
         )}
 
         {currentTab === 'series' && (
-          viewMode === 'disco' ? (
-            <CosmicDiscoGlobe
-              items={ChannelRepository.series}
-              type="series"
-              onPlayItem={(title, url) => handleOpenPlayer(title, url)}
-            />
-          ) : (
-            <CosmicPlanetaryCarousel
-              items={ChannelRepository.series}
-              type="series"
-              onPlayItem={(title, url) => handleOpenPlayer(title, url)}
-            />
-          )
+          <PhotoClotheslineView
+            type="series"
+            items={ChannelRepository.series}
+            categories={ChannelRepository.seriesCategories}
+            onPlayItem={(title, url) => handleOpenPlayer(title, url)}
+          />
         )}
 
         {currentTab === 'live' && (

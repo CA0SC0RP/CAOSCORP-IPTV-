@@ -1,6 +1,6 @@
 {
   "name": "CAOSCORP",
-  "description": "Reproductor IPTV futurista para Películas, Series y TV en Vivo con guía EPG estilo TiviMate y entorno interactivo.",
+  "description": "Reproductor IPTV con tendedero de fotografías Kodak para Películas y Series, carpetas del servidor y TV en vivo estilo TiviMate.",
   "permissions": [],
   "capabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

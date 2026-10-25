@@ -34,3 +34,57 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(79, 140, 255, 0.5);
 }
+
+/* Clothesline Drift Animations */
+@keyframes clotheslineDriftLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes clotheslineDriftRight {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-drift-left {
+  animation: clotheslineDriftLeft 80s linear infinite;
+  will-change: transform;
+}
+
+.animate-drift-right {
+  animation: clotheslineDriftRight 80s linear infinite;
+  will-change: transform;
+}
+
+.animate-drift-left-slow {
+  animation: clotheslineDriftLeft 120s linear infinite;
+  will-change: transform;
+}
+
+.animate-drift-right-slow {
+  animation: clotheslineDriftRight 120s linear infinite;
+  will-change: transform;
+}
+
+.animate-drift-left-fast {
+  animation: clotheslineDriftLeft 45s linear infinite;
+  will-change: transform;
+}
+
+.animate-drift-right-fast {
+  animation: clotheslineDriftRight 45s linear infinite;
+  will-change: transform;
+}
+
+.pause-animation {
+  animation-play-state: paused !important;
+}
+

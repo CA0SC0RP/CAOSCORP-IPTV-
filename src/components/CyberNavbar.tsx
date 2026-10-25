@@ -1,5 +1,5 @@
 import React from 'react';
-import { Film, Clapperboard, Radio, LogOut, Tv, Sparkles, Orbit, Disc } from 'lucide-react';
+import { Film, Clapperboard, Radio, LogOut, Tv, Sparkles } from 'lucide-react';
 import { cyberSound } from './CyberSound';
 
 interface CyberNavbarProps {
@@ -7,8 +7,6 @@ interface CyberNavbarProps {
   onSelectTab: (tab: 'movies' | 'series' | 'live') => void;
   onOpenLogin: () => void;
   accountInfo?: any;
-  viewMode?: 'disco' | 'planet';
-  onToggleViewMode?: () => void;
 }
 
 export const CyberNavbar: React.FC<CyberNavbarProps> = ({
@@ -16,8 +14,6 @@ export const CyberNavbar: React.FC<CyberNavbarProps> = ({
   onSelectTab,
   onOpenLogin,
   accountInfo,
-  viewMode,
-  onToggleViewMode,
 }) => {
   const navItems = [
     {
@@ -140,28 +136,12 @@ export const CyberNavbar: React.FC<CyberNavbarProps> = ({
 
       {/* Right controls: 3D Universe Mode Toggle & Change List */}
       <div className="flex items-center gap-3">
-        {/* Toggle between Disco Globe 3D and Planetary Orbit 3D if on movies or series */}
-        {currentTab !== 'live' && onToggleViewMode && (
-          <button
-            onClick={() => {
-              cyberSound.click();
-              onToggleViewMode();
-            }}
-            className="hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#090D1C] border border-[#1E2744] hover:border-[#00F0FF]/50 text-[#00F0FF] text-[11px] font-mono font-bold tracking-wider transition-all cursor-pointer shadow-md hover:scale-105"
-            title="Alternar entre Bola de Disco 3D y Planeta Orbital 3D"
-          >
-            {viewMode === 'disco' ? (
-              <>
-                <Disc size={15} className="animate-spin text-[#00F0FF]" />
-                <span>BOLA DE DISCO 3D</span>
-              </>
-            ) : (
-              <>
-                <Orbit size={15} className="text-[#FF0077]" />
-                <span>PLANETA 3D</span>
-              </>
-            )}
-          </button>
+        {/* Tendedero indicator badge if on movies or series */}
+        {currentTab !== 'live' && (
+          <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#090D1C] border border-[#1E2744] text-[#00F0FF] text-[11px] font-mono font-bold tracking-wider">
+            <Sparkles size={13} className="text-[#00F0FF] animate-pulse" />
+            <span>TENDEDERO KODAK</span>
+          </div>
         )}
 
         {accountInfo && (

@@ -40,6 +40,9 @@ export interface MovieItem {
   duration?: string;
   synopsis?: string;
   type?: 'movie';
+  added?: number | string;
+  isOnTv?: boolean;
+  originalFolder?: string;
 }
 
 export interface SeriesItem {
@@ -56,6 +59,9 @@ export interface SeriesItem {
   plot?: string;
   streamUrl?: string;
   type?: 'series';
+  added?: number | string;
+  isOnTv?: boolean;
+  originalFolder?: string;
 }
 
 export interface ScanResult {

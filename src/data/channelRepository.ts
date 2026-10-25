@@ -114,9 +114,13 @@ class ChannelRepositorySingleton {
     });
 
     const rawMovieCats: Category[] = result.movieCategories || [];
+    const movieCatMap = new Map<string, string>(rawMovieCats.map((c) => [c.id, c.name]));
     const moviesGrouped = new Map<string, MovieItem[]>();
 
     for (const m of rawMovies) {
+      if (!m.originalFolder) {
+        m.originalFolder = movieCatMap.get(m.categoryId) || 'Películas';
+      }
       const list = moviesGrouped.get(m.categoryId) || [];
       list.push(m);
       moviesGrouped.set(m.categoryId, list);
@@ -133,7 +137,7 @@ class ChannelRepositorySingleton {
     this.moviesByCategory = moviesGrouped;
     this.movies = rawMovies;
     this.movieCategories = [
-      { id: this.ALL, name: '⚡ Más Recientes & Estrenos', count: rawMovies.length, type: 'movie' },
+      { id: this.ALL, name: '⚡ Todas las Películas', count: rawMovies.length, type: 'movie' },
       ...movieCatList.filter((c) => c.id !== 'mcat_all'),
     ];
 
@@ -146,9 +150,13 @@ class ChannelRepositorySingleton {
     });
 
     const rawSeriesCats: Category[] = result.seriesCategories || [];
+    const seriesCatMap = new Map<string, string>(rawSeriesCats.map((c) => [c.id, c.name]));
     const seriesGrouped = new Map<string, SeriesItem[]>();
 
     for (const s of rawSeries) {
+      if (!s.originalFolder) {
+        s.originalFolder = seriesCatMap.get(s.categoryId) || 'Series';
+      }
       const list = seriesGrouped.get(s.categoryId) || [];
       list.push(s);
       seriesGrouped.set(s.categoryId, list);
@@ -165,7 +173,7 @@ class ChannelRepositorySingleton {
     this.seriesByCategory = seriesGrouped;
     this.series = rawSeries;
     this.seriesCategories = [
-      { id: this.ALL, name: '⚡ Más Recientes & Estrenos', count: rawSeries.length, type: 'series' },
+      { id: this.ALL, name: '⚡ Todas las Series', count: rawSeries.length, type: 'series' },
       ...seriesCatList.filter((c) => c.id !== 'scat_all'),
     ];
 

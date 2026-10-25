@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Account, AccountType } from '../data/models';
+import { Account } from '../data/models';
 import { AccountStore } from '../data/accountStore';
 import { ChannelRepository } from '../data/channelRepository';
 import { IptvClient } from '../data/iptvClient';
-import { Tv, Loader2, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { parseXtreamCredentials } from '../data/xtreamParser';
+import { Tv, Loader2, Sparkles, Eye, EyeOff, ClipboardPaste, CheckCircle2 } from 'lucide-react';
 
 interface LoginActivityProps {
   onLoginSuccess: () => void;
 }
 
 export const LoginActivity: React.FC<LoginActivityProps> = ({ onLoginSuccess }) => {
-  const [accountType, setAccountType] = useState<AccountType>('XTREAM');
   const [host, setHost] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [m3uUrl, setM3uUrl] = useState('');
+  const [autoFilled, setAutoFilled] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,44 +23,44 @@ export const LoginActivity: React.FC<LoginActivityProps> = ({ onLoginSuccess }) 
   // Prefill existing account if available
   useEffect(() => {
     const existing = AccountStore.load();
-    if (existing) {
-      setAccountType(existing.type);
+    if (existing && existing.type === 'XTREAM') {
       setHost(existing.host || '');
       setUsername(existing.username || '');
       setPassword(existing.password || '');
-      setM3uUrl(existing.m3uUrl || '');
     }
   }, []);
+
+  const processInput = (val: string) => {
+    const parsed = parseXtreamCredentials(val);
+    if (parsed.username || parsed.password) {
+      setHost(parsed.host || val);
+      if (parsed.username) setUsername(parsed.username);
+      if (parsed.password) setPassword(parsed.password);
+      setAutoFilled(true);
+      setTimeout(() => setAutoFilled(false), 5000);
+    } else {
+      setHost(val);
+    }
+  };
 
   const handleConnect = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setError(null);
 
-    let account: Account;
+    const h = host.trim();
+    const u = username.trim();
+    const p = password.trim();
 
-    if (accountType === 'M3U') {
-      const url = m3uUrl.trim();
-      if (!url) {
-        setError('Escribe la URL de la lista M3U');
-        return;
-      }
-      account = { type: 'M3U', m3uUrl: url };
-    } else {
-      const h = host.trim();
-      const u = username.trim();
-      const p = password.trim();
-
-      if (!h || !u || !p) {
-        setError('Completa servidor, usuario y contraseña');
-        return;
-      }
-      account = {
-        type: 'XTREAM',
-        host: IptvClient.normalizeHost(h),
-        username: u,
-        password: p,
-      };
+    if (!h || !u || !p) {
+      setError('Completa servidor, usuario y contraseña');
+      return;
     }
+    const account: Account = {
+      type: 'XTREAM',
+      host: IptvClient.normalizeHost(h),
+      username: u,
+      password: p,
+    };
 
     setLoading(true);
     try {
@@ -102,118 +102,83 @@ export const LoginActivity: React.FC<LoginActivityProps> = ({ onLoginSuccess }) 
             <Tv size={26} />
           </div>
           <h1 className="text-[34px] font-bold text-[#4F8CFF] leading-none tracking-wide">
-            CAOS TV
+            CAOSCORP
           </h1>
         </div>
 
         <p className="text-[16px] text-[#9AA3B5] mb-6">
-          Conecta tu servicio IPTV
+          Conecta tu servicio Xtream Codes
         </p>
 
-        {/* Radio selector */}
-        <div className="flex gap-6 mb-6 border-b border-[#2A2F45] pb-4">
-          <label className="flex items-center gap-2 cursor-pointer font-medium text-[15px] select-none">
-            <input
-              type="radio"
-              name="accountType"
-              value="XTREAM"
-              checked={accountType === 'XTREAM'}
-              onChange={() => {
-                setAccountType('XTREAM');
-                setError(null);
-              }}
-              className="w-4 h-4 text-[#4F8CFF] accent-[#4F8CFF] cursor-pointer"
-            />
-            <span className={accountType === 'XTREAM' ? 'text-[#F2F4F8]' : 'text-[#9AA3B5]'}>
-              Xtream Codes
-            </span>
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer font-medium text-[15px] select-none">
-            <input
-              type="radio"
-              name="accountType"
-              value="M3U"
-              checked={accountType === 'M3U'}
-              onChange={() => {
-                setAccountType('M3U');
-                setError(null);
-              }}
-              className="w-4 h-4 text-[#4F8CFF] accent-[#4F8CFF] cursor-pointer"
-            />
-            <span className={accountType === 'M3U' ? 'text-[#F2F4F8]' : 'text-[#9AA3B5]'}>
-              Lista M3U (URL)
-            </span>
-          </label>
-        </div>
+        {autoFilled && (
+          <div className="mb-4 p-3 bg-[#00FF88]/15 border border-[#00FF88]/40 rounded-lg text-[#00FF88] text-xs font-mono flex items-center gap-2">
+            <CheckCircle2 size={16} />
+            <span>Datos detectados y copiados automáticamente.</span>
+          </div>
+        )}
 
         {/* Form fields */}
         <form onSubmit={handleConnect} className="space-y-4">
-          {accountType === 'XTREAM' ? (
-            <>
-              <div>
-                <input
-                  type="text"
-                  placeholder="Servidor (http://dominio:puerto)"
-                  value={host}
-                  onChange={(e) => setHost(e.target.value)}
-                  disabled={loading}
-                  autoComplete="off"
-                  className="w-full px-4 py-3 bg-[#0E0F14] border border-[#2A2F45] focus:border-[#4F8CFF] focus:outline-none rounded-lg text-[#F2F4F8] placeholder-[#9AA3B5]/60 text-[16px] transition-colors"
-                />
-              </div>
+          <div>
+            <label className="block text-xs text-[#9AA3B5] uppercase font-mono mb-1">
+              Servidor (o pega tu enlace completo)
+            </label>
+            <input
+              type="text"
+              placeholder="http://servidor-iptv.com:8080 (o enlace get.php)"
+              value={host}
+              onChange={(e) => processInput(e.target.value)}
+              disabled={loading}
+              autoComplete="off"
+              className="w-full px-4 py-3 bg-[#0E0F14] border border-[#2A2F45] focus:border-[#4F8CFF] focus:outline-none rounded-lg text-[#F2F4F8] placeholder-[#9AA3B5]/60 text-[15px] transition-colors"
+            />
+          </div>
 
-              <div>
-                <input
-                  type="text"
-                  placeholder="Usuario"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={loading}
-                  autoComplete="off"
-                  className="w-full px-4 py-3 bg-[#0E0F14] border border-[#2A2F45] focus:border-[#4F8CFF] focus:outline-none rounded-lg text-[#F2F4F8] placeholder-[#9AA3B5]/60 text-[16px] transition-colors"
-                />
-              </div>
+          <div>
+            <label className="block text-xs text-[#9AA3B5] uppercase font-mono mb-1">
+              Usuario
+            </label>
+            <input
+              type="text"
+              placeholder="Usuario IPTV"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={loading}
+              autoComplete="off"
+              className="w-full px-4 py-3 bg-[#0E0F14] border border-[#2A2F45] focus:border-[#4F8CFF] focus:outline-none rounded-lg text-[#F2F4F8] placeholder-[#9AA3B5]/60 text-[15px] transition-colors"
+            />
+          </div>
 
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  autoComplete="off"
-                  className="w-full pl-4 pr-11 py-3 bg-[#0E0F14] border border-[#2A2F45] focus:border-[#4F8CFF] focus:outline-none rounded-lg text-[#F2F4F8] placeholder-[#9AA3B5]/60 text-[16px] transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9AA3B5] hover:text-[#F2F4F8] p-1 rounded transition-colors cursor-pointer"
-                  title={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </>
-          ) : (
-            <div>
+          <div>
+            <label className="block text-xs text-[#9AA3B5] uppercase font-mono mb-1">
+              Contraseña
+            </label>
+            <div className="relative">
               <input
-                type="text"
-                placeholder="URL de la lista M3U"
-                value={m3uUrl}
-                onChange={(e) => setM3uUrl(e.target.value)}
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
                 autoComplete="off"
-                className="w-full px-4 py-3 bg-[#0E0F14] border border-[#2A2F45] focus:border-[#4F8CFF] focus:outline-none rounded-lg text-[#F2F4F8] placeholder-[#9AA3B5]/60 text-[16px] transition-colors"
+                className="w-full pl-4 pr-11 py-3 bg-[#0E0F14] border border-[#2A2F45] focus:border-[#4F8CFF] focus:outline-none rounded-lg text-[#F2F4F8] placeholder-[#9AA3B5]/60 text-[15px] transition-colors"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9AA3B5] hover:text-[#F2F4F8] p-1 rounded transition-colors cursor-pointer"
+                title={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
-          )}
+          </div>
 
           {/* Connect button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-4 py-3.5 px-4 bg-[#4F8CFF] hover:bg-[#3D78EB] active:bg-[#2F65CE] text-white font-semibold text-[18px] rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#4F8CFF]/20 disabled:opacity-60 cursor-pointer"
+            className="w-full mt-4 py-3.5 px-4 bg-[#4F8CFF] hover:bg-[#3D78EB] active:bg-[#2F65CE] text-white font-semibold text-[17px] rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#4F8CFF]/20 disabled:opacity-60 cursor-pointer"
           >
             {loading ? (
               <>
@@ -221,7 +186,7 @@ export const LoginActivity: React.FC<LoginActivityProps> = ({ onLoginSuccess }) 
                 <span>Conectando...</span>
               </>
             ) : (
-              'Conectar'
+              'Conectar Xtream Codes'
             )}
           </button>
         </form>
