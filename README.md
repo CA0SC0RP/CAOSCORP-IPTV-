@@ -1,27 +1,31 @@
-# CAOS TV
+# CAOS TV (Web / React)
 
-Reproductor IPTV básico para Android TV.
+Reproductor IPTV web moderno y ligero, reescrito desde la versión original de Android TV manteniendo íntegramente las características esenciales, la lógica de negocio y la navegación de control remoto / teclado.
 
-## Qué hace (versión 0.1)
+## Características
 
-- Login con cuenta **Xtream Codes** (servidor, usuario, contraseña) o con una **lista M3U** por URL.
-- Canales en vivo con categorías, navegables con el control remoto.
-- Reproducción con Media3/ExoPlayer; arriba/abajo (o CH+/CH-) cambia de canal.
+- **Soporte Xtream Codes**: Autenticación con Servidor (`http://dominio:puerto`), Usuario y Contraseña, con descarga de categorías en vivo y streams.
+- **Soporte Listas M3U / M3U8**: Carga de listas remotas con procesamiento línea a línea de metadatos (`#EXTINF`, `#EXTGRP:`, logos `tvg-logo`, grupos `group-title`).
+- **Navegación estilo TV & Web**:
+  - Panel lateral de categorías (300px) con conteo dinámico de canales.
+  - Lista de canales con numeración, logotipos e iconos de respaldo.
+  - Navegación fluida por teclado o control remoto: flechas arriba/abajo para navegar, izquierda/derecha para alternar entre paneles, Enter para reproducir.
+- **Reproductor de vídeo en directo (HLS)**:
+  - Soporte HLS mediante `hls.js` con fallback nativo.
+  - Cadena de reintentos con URLs alternas (.m3u8, .ts).
+  - Barra inferior flotante OSD (número de canal, título e instrucciones) con auto-ocultado a los 4 segundos.
+  - Zapping rápido entre canales mediante flechas arriba/abajo (o teclas Channel Up / Down / Page Up / Page Down).
+- **Canales de demostración integrados**: Acceso inmediato con canales abiertos (NASA TV, DW, France 24, Blender test streams) para verificar el funcionamiento al instante.
 
-Pendiente: guía EPG y portales Stalker.
+## Ejecución
 
-## Compilar
+```bash
+# Instalar dependencias
+npm install
 
-Cada push a `main` compila el APK en GitHub Actions. El APK queda en:
+# Iniciar servidor de desarrollo (puerto 3000)
+npm run dev
 
-- Releases → etiqueta `latest` → `CAOS-TV.apk`
-- Actions → última ejecución → artefacto `CAOS-TV-apk`
-
-## Instalar en el TV
-
+# Compilar para producción
+npm run build
 ```
-adb connect IP_DEL_TV:5555
-adb install -r CAOS-TV.apk
-```
-
-Todos los APK van firmados con la misma llave, así que `-r` actualiza sin perder la cuenta guardada.

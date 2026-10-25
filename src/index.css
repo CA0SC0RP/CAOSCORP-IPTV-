@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #0E0F14;
+  --color-surface: #181A22;
+  --color-surface-focus: #2A2F45;
+  --color-surface-selected: #1F2433;
+  --color-accent: #4F8CFF;
+  --color-text: #F2F4F8;
+  --color-text-dim: #9AA3B5;
+  --color-error: #FF8A80;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbars for TV and desktop */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(14, 15, 20, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(79, 140, 255, 0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 140, 255, 0.5);
+}

@@ -1,0 +1,8 @@
+{
+  "name": "CAOSCORP",
+  "description": "Reproductor IPTV futurista para Películas, Series y TV en Vivo con guía EPG estilo TiviMate y entorno interactivo.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
