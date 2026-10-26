@@ -1,8 +1,8 @@
-name: Compilar APK
+name: Compilar APK (rama android-nativo)
 
 on:
   push:
-    branches: [main]
+    branches: [android-nativo]
   workflow_dispatch:
 
 permissions:
@@ -28,23 +28,24 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Poner nombre fijo al APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk CAOS-TV.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk CAOS-LAB.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: CAOS-TV-apk
-          path: CAOS-TV.apk
+          name: CAOS-LAB-apk
+          path: CAOS-LAB.apk
 
-      - name: Mover la etiqueta "latest" a este commit
+      # Etiqueta propia ("lab") para no pisar la versión web ni la etiqueta "latest".
+      - name: Mover la etiqueta "lab" a este commit
         run: |
-          git tag -f latest
-          git push -f origin latest
+          git tag -f lab
+          git push -f origin lab
 
       - name: Publicar en Releases (enlace fijo)
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: "Última versión (build ${{ github.run_number }})"
+          tag_name: lab
+          name: "CAOS Lab (build ${{ github.run_number }})"
           prerelease: true
-          files: CAOS-TV.apk
-          body: "APK de debug generado automáticamente del commit ${{ github.sha }}."
+          files: CAOS-LAB.apk
+          body: "APK de debug de la rama android-nativo, commit ${{ github.sha }}."

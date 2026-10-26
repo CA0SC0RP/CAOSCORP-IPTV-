@@ -30,6 +30,20 @@
             </intent-filter>
         </activity>
 
+        <!-- Pantalla de pruebas de interfaz: aparece como segundo ícono "CAOS Lab" -->
+        <activity
+            android:name=".lab.LabActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout|uiMode"
+            android:exported="true"
+            android:label="CAOS Lab"
+            android:screenOrientation="sensorLandscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".ui.ChannelsActivity"
             android:exported="false"

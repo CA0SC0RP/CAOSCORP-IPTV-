@@ -16,7 +16,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = runNumber
-        versionName = "0.1.$runNumber"
+        versionName = "0.2.$runNumber"
     }
 
     // Llave de debug fija (va en el repo) para que todos los APK compilados en
@@ -41,6 +41,12 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        // Compatible con Kotlin 1.9.24
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 }
 
@@ -57,4 +63,13 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:$media3")
     implementation("androidx.media3:media3-exoplayer-hls:$media3")
     implementation("androidx.media3:media3-ui:$media3")
+
+    // Interfaz Compose (pantalla CAOS Lab)
+    implementation("androidx.activity:activity-compose:1.9.2")
+    val composeBom = platform("androidx.compose:compose-bom:2024.09.03")
+    implementation(composeBom)
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.animation:animation")
 }
