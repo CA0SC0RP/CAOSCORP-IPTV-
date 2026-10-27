@@ -77,3 +77,29 @@
 - La primera pantalla nativa todavía no es una aplicación funcional completa: el cliente Xtream, el almacenamiento seguro, la carga de catálogos, la reproducción y la EPG real siguen pendientes.
 - No afirmar que compila hasta revisar el resultado del workflow de GitHub Actions.
 - La siguiente fase será conseguir una compilación APK real, corregir errores de construcción si aparecen y luego implementar el cliente Xtream con pruebas unitarias de respuestas API.
+
+
+## 2026-10-27 — Alcance confirmado y arranque de la parrilla viva
+
+### Decisiones confirmadas por el usuario
+- Catch-up/replay queda fuera de la primera versión.
+- Copias de seguridad/restauración quedan pospuestas; se reevaluarán si se decide comercializar la aplicación.
+- Se mantienen las fichas de películas y series, selección de subtítulos y pistas de audio cuando el stream lo permita, historial y favoritos.
+- Privacidad: proteger credenciales, no registrar secretos y evitar rastreo innecesario o publicidad intrusiva.
+- La guía de TV en vivo se mantiene separada visualmente de la parrilla de películas/series.
+- Se reduce la densidad inicial de la parrilla: empezar con unas 4–5 filas visibles y aproximadamente 8–12 portadas por fila, ajustándolo mediante pruebas.
+- Cada fila se moverá como una sola franja horizontal, alternando direcciones. No habrá animaciones individuales por portada.
+- La portada enfocada por el mando se resaltará de forma sutil, independiente del movimiento de la fila.
+- La resolución 4K es una meta visual, no una garantía de rendimiento. El rendimiento debe medirse en dispositivos físicos.
+
+### Cambios de documentación realizados
+- Se actualizó `docs/ESPECIFICACION_PRODUCTO.md` con el alcance confirmado, reglas de datos reales, privacidad y diseño de la parrilla viva.
+- Se actualizó `docs/PLAN_IMPLEMENTACION_ANDROID_TV.md` con fases de implementación y criterios de validación.
+- Se mantiene todo en `planning/xtream-epg-spec`; `main` no se modificó.
+
+### Próximos pasos técnicos
+1. Preservar la actividad Compose inicial antes de rediseñar la navegación.
+2. Implementar navegación principal simplificada y estructura de parrilla viva.
+3. Cargar catálogos reales desde Xtream.
+4. Implementar reproducción, EPG, fichas, subtítulos/audio, historial y favoritos por etapas.
+5. Compilar en GitHub Actions y probar con cuenta autorizada y dispositivo real antes de declarar funciones completas.
