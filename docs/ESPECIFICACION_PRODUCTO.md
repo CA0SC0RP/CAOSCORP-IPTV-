@@ -99,6 +99,11 @@ El tendedero de portadas es un elemento distintivo y debe conservarse como refer
 - No incluir grabación ni multiview de 3–4 canales en el alcance inicial.
 - La identificación automática de eventos deportivos queda para una fase posterior y depende de contar con datos fiables de eventos, horarios y canales.
 
+## Regla absoluta de datos reales
+
+- Si no existe programación EPG real, dejar el campo vacío o mostrar “Información no disponible”. Nunca inventar títulos, horarios, duraciones ni barras de progreso.
+- Si faltan año, calificación, sinopsis u otros metadatos, dejarlos desconocidos; no usar valores predeterminados que parezcan datos reales.
+
 ## 8. Fases propuestas
 
 ### Fase 0 — Auditoría y documentación
