@@ -5,7 +5,7 @@
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <application
         android:allowBackup="false"
-        android:label="Chaos Corp IPTV"
+        android:label="CAOSCORP IPTV"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.NoActionBar">
         <activity
