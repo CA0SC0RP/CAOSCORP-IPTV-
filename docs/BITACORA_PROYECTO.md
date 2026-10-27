@@ -103,3 +103,11 @@
 3. Cargar catálogos reales desde Xtream.
 4. Implementar reproducción, EPG, fichas, subtítulos/audio, historial y favoritos por etapas.
 5. Compilar en GitHub Actions y probar con cuenta autorizada y dispositivo real antes de declarar funciones completas.
+
+
+### Primer cambio de interfaz iniciado
+- Se guardó la interfaz Compose anterior en `docs/backup/MainActivity-inicial-backup.md`.
+- Se reemplazó la distribución con menú lateral por una pantalla de inicio más limpia con cuatro accesos grandes: TV en vivo, Películas, Series y Ajustes.
+- Se añadieron estados vacíos explícitos para no presentar catálogos ficticios y se documentó visualmente el concepto de parrilla viva.
+- La conexión Xtream existente se conserva, pero el mensaje aclara que autenticar no significa que el catálogo esté integrado.
+- **Validación pendiente:** todavía no se ha ejecutado una compilación tras este cambio ni se ha probado la navegación en un televisor físico. El siguiente paso es revisar GitHub Actions y corregir cualquier error antes de añadir la animación real de las filas.
