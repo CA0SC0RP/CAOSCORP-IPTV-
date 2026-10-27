@@ -1,91 +1,73 @@
-# Plan de implementación — Android TV, Xtream y reproducción
+# Plan de implementación — Chaos Corp IPTV para Android TV
 
 **Fecha:** 2026-10-27  
-**Estado:** base nativa inicial creada en planning/xtream-epg-spec; compilación y pruebas aún pendientes.
+**Estado:** base nativa y autenticación inicial presentes; integración completa y pruebas reales pendientes.
 
 ## Objetivo
+Construir una aplicación Android TV nativa, con Xtream Codes como método inicial de cuenta, reproducción Media3/ExoPlayer, EPG basada en datos reales y una parrilla viva de portadas para películas y series.
 
-Crear una aplicación Android nativa para Android TV que reutilice el proyecto web actual como referencia visual y funcional, sin fingir que el código React/Node es una app Android terminada.
-
-## Arquitectura propuesta
-
-- **Aplicación:** Kotlin.
-- **Interfaz:** Jetpack Compose para Android TV, con foco visible y navegación completa por D-pad/OK/Back.
-- **Reproducción:** AndroidX Media3 ExoPlayer, con una capa de reproducción que reciba la URL de stream y el tipo de contenido detectado.
-- **Red Xtream:** cliente HTTP nativo, con tiempos de espera, cancelación de solicitudes, validación de respuestas y errores diferenciados.
-- **Modelos:** tipos separados para cuenta, categoría, canal, película, serie, episodio y programa EPG. Campos desconocidos deben permanecer nulos; no asignar valores ficticios.
-- **Credenciales:** almacenamiento seguro para la aplicación nativa. Nunca escribir contraseñas o URLs con credenciales en logs.
-- **EPG:** parser XMLTV separado del cliente Xtream, caché local y servicio de asociación de canales. La guía externa será opcional y no impedirá entrar a TV en vivo si falla.
-- **Configuración de país/guía:** México como primera configuración; permitir ampliar países y fuentes sin reescribir la lógica principal.
-
-## Flujo de conexión Xtream
-
-1. Normalizar la URL base y validar que use HTTP/HTTPS.
-2. Consultar `player_api.php` con credenciales y timeout limitado.
-3. Comprobar la autenticación y el estado de cuenta sin registrar secretos.
-4. Cargar categorías y elementos disponibles por tipo de contenido; tratar cada respuesta con validación, timeout y error explícito.
-5. Mantener los datos parciales válidos si una categoría opcional falla, mostrando un estado comprensible en vez de declarar éxito total sin explicación.
-6. Construir URLs de stream sin asumir que todas las cuentas soportan el mismo formato. Probar formatos disponibles del proveedor.
-7. No guardar ni mostrar en logs URLs que incorporen usuario o contraseña.
-
-## Reproductor nativo
-
-- Crear una sesión Media3/ExoPlayer por reproducción activa y liberar recursos al cerrar/cambiar de canal.
-- Gestionar estados: preparando, reproduciendo, pausado, buffer, error y finalizado.
-- Mostrar mensajes útiles sin incluir credenciales ni URL privada.
-- Controles con mando: reproducir/pausar, volver, cambiar canal y mostrar/ocultar controles.
-- No asumir que toda URL es HLS por su extensión. Validar MIME/tipo cuando exista y usar la configuración compatible de Media3.
-- Probar HLS, MPEG-TS u otros formatos únicamente cuando el proveedor real los entregue y el dispositivo los soporte.
-- Registrar resultados de pruebas con códigos de error y tipo de formato, nunca con URL sensible.
-
-## EPG: reglas obligatorias
-
-- Eliminar `generateEpgSchedule` y cualquier generador de programación de demostración de las pantallas de producto.
-- Si no hay datos, mostrar “Información no disponible” o dejar el campo vacío; no generar títulos, horarios, duraciones, porcentajes ni progreso.
-- Priorizar la EPG del proveedor cuando sea válida.
-- Descargar XMLTV externo en segundo plano y usarlo solo para huecos donde la coincidencia de canal sea fiable.
-- No asignar guía externa cuando la coincidencia sea ambigua.
-- Convertir horarios a la zona horaria del dispositivo conservando la información de origen.
-- Si la fuente externa falla, conservar la última copia válida y mantener funcionando el resto de la aplicación.
+## Arquitectura
+- Kotlin + Jetpack Compose.
+- Navegación D-pad/OK/Back con foco visible y pantallas legibles desde distancia.
+- AndroidX Media3/ExoPlayer como primer y único motor.
+- Cliente Xtream nativo con timeouts, cancelación cuando corresponda, validación de respuestas y errores comprensibles.
+- Modelos separados para cuenta, categoría, canal, película, serie, episodio y programa EPG.
+- Almacenamiento local seguro de credenciales y persistencia para historial/favoritos.
+- Parser XMLTV y caché separados del cliente Xtream; fallo de la EPG externa no debe bloquear la app.
+- No registrar credenciales ni URLs que contengan credenciales.
 
 ## Orden de trabajo
+### Paso 1 — Alcance y preservación
+- Actualizar especificación y bitácora.
+- Guardar una copia del código de la interfaz inicial antes de rediseñarla.
+- Mantener todos los cambios en `planning/xtream-epg-spec`; no modificar `main`.
 
-### Paso A — Base Android real
-Crear módulo Android nativo y configuración Gradle coherente; confirmar que la tarea de compilación genera un APK real. El Gradle actual del repositorio solo contiene tareas de tipo demostrativo y no debe tratarse como compilación Android.
+### Paso 2 — Conexión y modelos
+- Validar la URL base y autenticar mediante `player_api.php`.
+- Implementar carga real de categorías y contenido: canales, películas y series.
+- Diferenciar autenticación inválida, timeout, fallo de red y respuesta incompleta.
+- Añadir pruebas unitarias con respuestas de API sintéticas solo para probar la lógica; nunca presentarlas como contenido real.
 
-### Paso B — Conexión
-Implementar cliente Xtream nativo, modelos y manejo de errores; añadir pruebas unitarias con respuestas ficticias de API (solo para probar la lógica, nunca mostrarlas como datos reales al usuario).
+### Paso 3 — Reproductor
+- Integrar Media3/ExoPlayer y estados de carga, reproducción, pausa, buffer y error.
+- Liberar recursos al cambiar/cerrar reproducción.
+- Probar streams autorizados y formatos que realmente entregue el proveedor.
+- Implementar controles de mando, selección de subtítulos y pistas de audio cuando el stream lo permita.
 
-### Paso C — Reproductor
-Integrar Media3/ExoPlayer y probar reproducción con un stream de prueba legal o una cuenta autorizada. Documentar formatos y dispositivos comprobados.
+### Paso 4 — TV en vivo y EPG
+- Lista real de canales, categorías, selección y reproductor persistente.
+- Consultar la EPG que ofrezca el proveedor.
+- Evaluar la fuente XMLTV externa antes de integrarla: disponibilidad, actualización, tamaño, zona horaria, IDs, políticas y redistribución.
+- Asociar canales de forma conservadora y completar solo huecos con coincidencia fiable.
+- Sin datos válidos, mostrar “Información de programación no disponible”.
 
-### Paso D — EPG
-Eliminar programación ficticia, integrar parser XMLTV y combinar datos solo con asociaciones fiables. Añadir pruebas para XML inválido, zona horaria, medianoche, solapamientos, ausencia de datos y canal ambiguo.
+### Paso 5 — Parrilla viva
+- Usar portadas del catálogo real, no carteles de muestra en la experiencia final.
+- Punto de partida visual: 4–5 filas visibles y aproximadamente 8–12 portadas por fila; ajustar a la relación de aspecto y al dispositivo.
+- Desplazar cada fila como una sola franja, con direcciones alternas y movimiento lento.
+- No animar cada portada individualmente.
+- Resaltar el foco del mando con ampliación ligera y borde/iluminación discreta.
+- Pausar o reducir el movimiento mientras se navega y restaurar la posición al volver de una ficha.
+- Optimizar carga de imágenes, caché y recomposición.
 
-### Paso E — UX de TV
-Portar por fases la identidad visual del tendedero y las pantallas clave, con pruebas de navegación por mando.
+### Paso 6 — Fichas y funciones personales
+- Fichas de películas/series con solo metadatos reales disponibles.
+- Temporadas y episodios reales.
+- Historial y favoritos.
+- Subtítulos y pistas de audio cuando estén disponibles.
+- Copias de seguridad y catch-up quedan fuera de la primera versión.
+
+### Paso 7 — Validación
+- Compilar con GitHub Actions y corregir errores.
+- Verificar autenticación y carga con una cuenta autorizada sin compartir credenciales en repositorio.
+- Probar navegación con mando y reproducción real.
+- Medir rendimiento/FPS/memoria en hardware Android TV físico; no inferirlo solo de la resolución 4K o del éxito de compilación.
+- Registrar fecha, resultado, dispositivo, limitaciones y pruebas no realizadas.
 
 ## Criterios de aceptación
-
-- La rama contiene un proyecto Android que compila a un APK real.
-- Una cuenta Xtream válida puede autenticar y cargar el contenido que el proveedor ofrece.
-- Las credenciales incorrectas y fallos de red producen errores claros, sin filtrar secretos.
-- Un stream autorizado compatible se reproduce en el reproductor nativo y los recursos se liberan correctamente.
-- No se genera programación ni metadatos inventados.
-- La EPG externa solo completa huecos con asociaciones fiables y nunca bloquea la reproducción si no está disponible.
-- Los resultados de compilación y pruebas se registran con fecha y limitaciones reales.
-
-## Dependencias de validación
-
-La revisión del código y las pruebas unitarias no requieren compartir una lista personal. La prueba de autenticación y reproducción en vivo sí requiere un stream/cuenta de prueba autorizado y accesible; se pedirá solo cuando el código esté preparado. No incluir credenciales en commits, incidencias ni documentación.
-
-
-## Flujo de pantallas acordado
-
-- **Inicio:** acceso para agregar/administrar cuenta y entrar a las áreas principales.
-- **Cuenta:** formulario Xtream Codes (servidor, usuario y contraseña); validar contra el proveedor, proteger credenciales y mostrar estado real de conexión.
-- **TV en vivo:** lista de canales y reproductor lateral persistente; al navegar se puede cambiar el canal y, con OK sobre el canal que ya se reproduce o una acción de pantalla completa, ampliar el video. La guía muestra únicamente programas XMLTV reales.
-- **Películas/Series:** tendederos de 3–4 hileras horizontales, movimiento suave, filtros de recientes/estrenos, ficha al seleccionar portada y acceso a reproducción.
-- **Mando:** foco visible; flechas para navegar, OK para activar y Atrás para regresar conservando contexto cuando corresponda.
-
-La pantalla Compose inicial y el módulo :app ya se añadieron. No se debe confundir esta estructura con la integración funcional: cliente Xtream, credenciales seguras, reproducción, catálogos y EPG todavía no están conectados.
+- APK generado por una compilación comprobada.
+- Conexión Xtream real, carga de catálogo y errores manejados.
+- Reproducción probada con stream autorizado.
+- EPG real o estado vacío honesto; nunca programación inventada.
+- Parrilla viva navegable con mando, sin perder foco ni saturar la interfaz.
+- Historial/favoritos persistentes y secretos protegidos.
