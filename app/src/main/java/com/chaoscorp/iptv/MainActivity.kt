@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
@@ -211,7 +212,8 @@ private fun ConnectionPanel(
         )
         OutlinedTextField(
             value = password, onValueChange = onPasswordChange, label = { Text("Contraseña") },
-            singleLine = true, modifier = Modifier.fillMaxWidth(0.78f)
+            singleLine = true, visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth(0.78f)
         )
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Button(onClick = onConnect, modifier = Modifier.height(50.dp)) { Text(if (notice == "Conectando con el proveedor...") "Conectando..." else "Conectar") }
