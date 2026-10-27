@@ -111,3 +111,29 @@
 - Se añadieron estados vacíos explícitos para no presentar catálogos ficticios y se documentó visualmente el concepto de parrilla viva.
 - La conexión Xtream existente se conserva, pero el mensaje aclara que autenticar no significa que el catálogo esté integrado.
 - **Validación pendiente:** todavía no se ha ejecutado una compilación tras este cambio ni se ha probado la navegación en un televisor físico. El siguiente paso es revisar GitHub Actions y corregir cualquier error antes de añadir la animación real de las filas.
+
+
+## 2026-10-27 — Correcciones de conexión, contraste y marca
+
+### Reporte del usuario
+- Al introducir la dirección, la interfaz parecía no responder.
+- No estaba disponible la función de QR para capturar los datos desde un teléfono.
+- El título “Todo tu entretenimiento” no tenía contraste suficiente con el fondo.
+- La marca debe escribirse **CAOSCORP**, en una sola palabra.
+
+### Cambios realizados
+- Se mejoró el flujo de conexión: ahora valida campos obligatorios y el prefijo HTTP/HTTPS antes de hacer la petición.
+- El botón ahora indica “Conectar cuenta” y cambia a estado “Conectando…”.
+- Los errores se muestran en un panel visible; una autenticación correcta vuelve al inicio y confirma el resultado.
+- Se aclaró que autenticar una cuenta no significa que el catálogo ya esté cargado.
+- Se forzó el color blanco del título principal y de los encabezados principales para corregir el contraste sobre el fondo oscuro.
+- Se cambió la marca visible a **CAOSCORP** y la etiqueta Android a **CAOSCORP IPTV**.
+- Se añadió una nota de interfaz sobre el emparejamiento por QR, pero **el QR funcional todavía no está implementado**.
+
+### Limitación importante del QR
+No se debe codificar directamente la contraseña en el QR. Para que el teléfono pueda enviar los datos a la TV hace falta un formulario web HTTPS y un mecanismo de emparejamiento temporal seguro, con expiración y recepción por la aplicación. Hasta implementar ese servicio, no se afirma que el QR funcione.
+
+### Validación pendiente
+- Aún hay que compilar el APK de estos cambios con GitHub Actions.
+- No se ha probado con las credenciales del usuario ni con su dispositivo.
+- Si la conexión sigue sin responder, se deberá revisar el resultado del workflow y, después, el comportamiento con una cuenta autorizada; no pedir ni publicar contraseñas en la bitácora.
