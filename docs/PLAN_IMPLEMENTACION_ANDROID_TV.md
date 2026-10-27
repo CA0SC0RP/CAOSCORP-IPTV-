@@ -1,7 +1,7 @@
 # Plan de implementación — Android TV, Xtream y reproducción
 
 **Fecha:** 2026-10-27  
-**Estado:** definición técnica; todavía no es una implementación compilada ni probada.
+**Estado:** base nativa inicial creada en planning/xtream-epg-spec; compilación y pruebas aún pendientes.
 
 ## Objetivo
 
@@ -78,3 +78,14 @@ Portar por fases la identidad visual del tendedero y las pantallas clave, con pr
 ## Dependencias de validación
 
 La revisión del código y las pruebas unitarias no requieren compartir una lista personal. La prueba de autenticación y reproducción en vivo sí requiere un stream/cuenta de prueba autorizado y accesible; se pedirá solo cuando el código esté preparado. No incluir credenciales en commits, incidencias ni documentación.
+
+
+## Flujo de pantallas acordado
+
+- **Inicio:** acceso para agregar/administrar cuenta y entrar a las áreas principales.
+- **Cuenta:** formulario Xtream Codes (servidor, usuario y contraseña); validar contra el proveedor, proteger credenciales y mostrar estado real de conexión.
+- **TV en vivo:** lista de canales y reproductor lateral persistente; al navegar se puede cambiar el canal y, con OK sobre el canal que ya se reproduce o una acción de pantalla completa, ampliar el video. La guía muestra únicamente programas XMLTV reales.
+- **Películas/Series:** tendederos de 3–4 hileras horizontales, movimiento suave, filtros de recientes/estrenos, ficha al seleccionar portada y acceso a reproducción.
+- **Mando:** foco visible; flechas para navegar, OK para activar y Atrás para regresar conservando contexto cuando corresponda.
+
+La pantalla Compose inicial y el módulo :app ya se añadieron. No se debe confundir esta estructura con la integración funcional: cliente Xtream, credenciales seguras, reproducción, catálogos y EPG todavía no están conectados.
