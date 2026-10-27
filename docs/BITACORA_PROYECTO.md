@@ -51,3 +51,29 @@
 3. Eliminar los datos ficticios de EPG y metadatos.
 4. Verificar la fuente XMLTV externa antes de integrarla.
 5. Revisar los cambios de esta rama antes de cualquier integración a `main`.
+
+
+## 2026-10-27 — Inicio de la base nativa Android TV
+
+### Cambios realizados en la rama de trabajo
+- Se sustituyó la tarea Gradle demostrativa por configuración real de plugins Android/Kotlin y se incluyó el módulo :app.
+- Se creó app/build.gradle.kts con Compose, dependencias iniciales de Media3/ExoPlayer y configuración Android.
+- Se añadió el manifiesto con permisos de red y entradas de lanzamiento Android/Android TV.
+- Se creó una primera actividad Compose con menú lateral: Inicio, TV en vivo, Películas, Series y Ajustes.
+- Se añadió el formulario inicial para servidor, usuario y contraseña Xtream Codes. Por ahora solo valida que los campos no estén vacíos; todavía no realiza una conexión ni guarda las credenciales.
+- Las secciones de TV, películas y series son estructura inicial de navegación, no pantallas terminadas. No incluyen canales, portadas ni programación simulada.
+- Se añadió el workflow .github/workflows/android.yml para intentar compilar un APK debug en GitHub Actions y publicar el APK como artefacto si la compilación termina correctamente.
+
+### Flujo de producto confirmado para implementar
+1. Inicio / menú principal.
+2. Agregar o administrar una cuenta Xtream Codes.
+3. Cargar los catálogos disponibles del proveedor.
+4. TV en vivo: lista de canales junto al reproductor, selección/cambio de canal, guía EPG real y acceso a pantalla completa.
+5. Películas y series: tendedero de 3–4 hileras horizontales, filtros para recientes/estrenos, ficha al seleccionar portada y reproducción.
+6. Ajustes para cuentas, reproducción y guía EPG.
+
+### Estado real y pendientes
+- Estos cambios están únicamente en planning/xtream-epg-spec; main no se ha modificado.
+- La primera pantalla nativa todavía no es una aplicación funcional completa: el cliente Xtream, el almacenamiento seguro, la carga de catálogos, la reproducción y la EPG real siguen pendientes.
+- No afirmar que compila hasta revisar el resultado del workflow de GitHub Actions.
+- La siguiente fase será conseguir una compilación APK real, corregir errores de construcción si aparecen y luego implementar el cliente Xtream con pruebas unitarias de respuestas API.
