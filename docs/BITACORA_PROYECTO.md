@@ -33,8 +33,14 @@
 - La cuenta web se guarda en `localStorage`, incluida la contraseña; no se debe trasladar ese almacenamiento sin protección a la app nativa.
 - No se usó una cuenta personal ni se probaron streams; no se ejecutó compilación ni prueba en Android TV.
 
+### Siguiente paso definido
+- Se confirmó que la EPG debe quedar vacía o mostrar “Información no disponible” si no hay datos reales; se prohíben horarios, títulos, duraciones y progreso inventados.
+- Se creó el plan técnico en `docs/PLAN_IMPLEMENTACION_ANDROID_TV.md`.
+- El plan propone Kotlin, Jetpack Compose para TV, Media3/ExoPlayer, cliente Xtream nativo, almacenamiento seguro y EPG XMLTV con caché.
+- La auditoría no usó una lista personal ni validó streams reales. Las pruebas reales se harán cuando exista un reproductor y un cliente preparados para ello.
+
 ### Pendiente
-1. Definir arquitectura nativa Kotlin/Android TV con Media3/ExoPlayer.
+1. Crear y compilar el módulo Android nativo con Media3/ExoPlayer.
 2. Probar autenticación Xtream, carga parcial, timeout, formatos y reproducción con una cuenta de prueba autorizada.
 3. Eliminar los datos ficticios de EPG y metadatos.
 4. Verificar la fuente XMLTV externa antes de integrarla.
