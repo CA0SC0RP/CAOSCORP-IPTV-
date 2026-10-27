@@ -148,3 +148,11 @@ No se debe codificar directamente la contraseña en el QR. Para que el teléfono
 - Se consultó el workflow `40572621539`: la compilación falló al resolver el plugin Gradle `org.jetbrains.kotlin.android:2.0.21`, antes de compilar el código de la interfaz. No se generó APK en ese intento.
 - Se inició una repetición del job fallido para distinguir un fallo transitorio de resolución de dependencias. El resultado de la repetición queda pendiente.
 - No se cambió `main`; el trabajo continúa en `planning/xtream-epg-spec`.
+
+
+### Avance adicional del QR — código inicial del servicio
+
+- Se añadieron `pairing/src/index.js`, `pairing/public/pair/index.html`, `pairing/wrangler.toml` y `pairing/README.md` en la rama de trabajo.
+- El primer servicio usa sesiones efímeras en Durable Objects; el formulario móvil cifra los datos con AES-GCM y envuelve la clave AES con RSA-OAEP. El servicio solo debe almacenar el paquete cifrado.
+- Esto es código inicial pendiente de pruebas y revisión; todavía no se ha desplegado y la aplicación Android aún no está conectada a él. Por lo tanto, no existe todavía un QR funcional.
+- Próximas tareas: validar y desplegar el Worker, obtener su URL HTTPS real, implementar el cliente Android (creación de sesión, generación del QR, sondeo y descifrado local), conectar los datos al flujo Xtream y ejecutar pruebas de extremo a extremo.
