@@ -9,41 +9,7 @@ interface TiviMateLiveTvViewProps {
   onFullscreenClean: (channel: Channel, index: number) => void;
 }
 
-// Generate realistic EPG schedule for any channel if remote XMLTV is not attached
-function generateEpgSchedule(channelName: string) {
-  const now = new Date();
-  const currentHour = now.getHours();
-
-  const sampleShows = [
-    'Noticias en Directo // Emisión Central',
-    'Documental: Exploración Cósmica',
-    'Liga de Campeones: Resumen y Análisis',
-    'Cine de Acción: Operación Especial',
-    'Reportaje Especial: Futuro & Tecnología',
-    'Magacín Cultural & Tendencias',
-    'Serie Policial: Casos Sin Resolver',
-    'Debate en Vivo // Mesa Redonda',
-    'Cine Prime: Estreno de la Noche',
-  ];
-
-  const hash = Math.abs(channelName.split('').reduce((a, b) => a + b.charCodeAt(0), 0));
-  const shows = [];
-
-  for (let i = 0; i < 6; i++) {
-    const showHour = (currentHour + i) % 24;
-    const startStr = `${showHour.toString().padStart(2, '0')}:00`;
-    const endStr = `${((showHour + 1) % 24).toString().padStart(2, '0')}:00`;
-    const title = sampleShows[(hash + i) % sampleShows.length];
-    shows.push({
-      start: startStr,
-      end: endStr,
-      title,
-      duration: '60 min',
-      isCurrent: i === 0,
-    });
-  }
-  return shows;
-}
+// No synthetic EPG data: until a real guide is connected, schedule fields stay empty.
 
 export const TiviMateLiveTvView: React.FC<TiviMateLiveTvViewProps> = ({ onFullscreenClean }) => {
   const [channels] = useState<Channel[]>(ChannelRepository.channels);
@@ -66,8 +32,8 @@ export const TiviMateLiveTvView: React.FC<TiviMateLiveTvViewProps> = ({ onFullsc
   });
 
   const activeFocusChannel = filteredChannels[selectedChannelIndex] || filteredChannels[0] || channels[0];
-  const epgSchedule = generateEpgSchedule(activeFocusChannel?.name || 'Canal');
-  const currentProgram = epgSchedule[0];
+  const epgSchedule: never[] = [];
+  const currentProgram = undefined;
 
   // Initialize and keep playing channel continuous in PIP box
   useEffect(() => {
@@ -263,30 +229,35 @@ export const TiviMateLiveTvView: React.FC<TiviMateLiveTvViewProps> = ({ onFullsc
                 <span className="text-xs font-mono font-bold text-[#00F0FF] px-2 py-0.5 rounded bg-[#00F0FF]/15 border border-[#00F0FF]/30">
                   {activeFocusChannel?.name || 'CANAL'}
                 </span>
-                <span className="text-xs font-mono text-[#9AA3B5] flex items-center gap-1">
-                  <Clock size={12} />
-                  <span>{currentProgram?.start} - {currentProgram?.end}</span>
-                </span>
+                {currentProgram && (
+                  <span className="text-xs font-mono text-[#9AA3B5] flex items-center gap-1">
+                    <Clock size={12} />
+                    <span>{currentProgram.start} - {currentProgram.end}</span>
+                  </span>
+                )}
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-black font-mono text-white truncate">
-                {currentProgram?.title}
-              </h3>
-
-              <p className="text-xs text-[#9AA3B5] line-clamp-2 max-w-2xl leading-relaxed">
-                Transmisión en directo del canal {activeFocusChannel?.name}. Programación continuada y actualizada en tiempo real mediante la guía electrónica de CAOSCORP.
-              </p>
-
-              {/* Progress bar of current show */}
-              <div className="w-full max-w-md pt-1">
-                <div className="w-full h-1.5 bg-[#181A22] rounded-full overflow-hidden">
-                  <div className="w-3/5 h-full bg-[#00F0FF] rounded-full shadow-[0_0_8px_#00F0FF]" />
-                </div>
-                <div className="flex justify-between text-[10px] font-mono text-[#9AA3B5] mt-1">
-                  <span>Iniciado a las {currentProgram?.start}</span>
-                  <span className="text-[#00F0FF]">28 min restantes</span>
-                </div>
-              </div>
+              {currentProgram ? (
+                <>
+                  <h3 className="text-xl sm:text-2xl font-black font-mono text-white truncate">
+                    {currentProgram.title}
+                  </h3>
+                  <p className="text-xs text-[#9AA3B5] line-clamp-2 max-w-2xl leading-relaxed">
+                    {currentProgram.description || ''}
+                  </p>
+                  {currentProgram.progress !== undefined && (
+                    <div className="w-full max-w-md pt-1">
+                      <div className="w-full h-1.5 bg-[#181A22] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#00F0FF] rounded-full shadow-[0_0_8px_#00F0FF]" style={{ width: `${currentProgram.progress}%` }} />
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="text-xs text-[#9AA3B5] line-clamp-2 max-w-2xl leading-relaxed">
+                  Información de programación no disponible.
+                </p>
+              )}
             </div>
 
             {/* Continuous Live Video PIP Window (Recuadro pequeño en la esquina superior) */}
@@ -333,30 +304,18 @@ export const TiviMateLiveTvView: React.FC<TiviMateLiveTvViewProps> = ({ onFullsc
 
             {/* Timeline slots for current and upcoming shows */}
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-              {epgSchedule.map((slot, i) => (
-                <div
-                  key={i}
-                  className={`p-3.5 rounded-xl border flex items-center justify-between transition-colors ${
-                    slot.isCurrent
-                      ? 'bg-[#101F2E] border-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.15)] text-white'
-                      : 'bg-[#07080D] border-[#2A2F45] text-[#9AA3B5]'
-                  }`}
-                >
-                  <div className="flex items-center gap-4 min-w-0">
-                    <span className={`text-xs font-mono font-bold w-24 shrink-0 ${slot.isCurrent ? 'text-[#00F0FF]' : ''}`}>
-                      {slot.start} - {slot.end}
-                    </span>
-
-                    <span className="text-sm font-mono font-bold truncate">
-                      {slot.title}
-                    </span>
-                  </div>
-
-                  <span className="text-xs font-mono shrink-0 pl-3">
-                    {slot.duration}
-                  </span>
+              {epgSchedule.length === 0 ? (
+                <div className="p-4 rounded-xl border border-[#2A2F45] bg-[#07080D] text-sm font-mono text-[#9AA3B5]">
+                  Información de programación no disponible.
                 </div>
-              ))}
+              ) : (
+                epgSchedule.map((slot, i) => (
+                  <div key={i} className="p-3.5 rounded-xl border bg-[#07080D] border-[#2A2F45] text-[#9AA3B5]">
+                    {/* Render only real guide records supplied by the EPG data layer. */}
+                    {JSON.stringify(slot)}
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
