@@ -63,8 +63,17 @@
         username: document.getElementById("username").value.trim(),
         password: document.getElementById("password").value
       });
-      const encrypted = await crypto.subtle.encrypt({name:"RSA-OAEP"}, publicKey, new TextEncoder().encode(payload));
-      const ciphertext = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+      const aesKey = await crypto.subtle.generateKey({name:"AES-GCM",length:256}, true, ["encrypt"]);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const encryptedData = await crypto.subtle.encrypt({name:"AES-GCM",iv}, aesKey, new TextEncoder().encode(payload));
+      const rawAesKey = await crypto.subtle.exportKey("raw", aesKey);
+      const wrappedKey = await crypto.subtle.encrypt({name:"RSA-OAEP"}, publicKey, rawAesKey);
+      const toBase64 = (value) => btoa(String.fromCharCode(...new Uint8Array(value)));
+      const ciphertext = JSON.stringify({
+        wrappedKey: toBase64(wrappedKey),
+        iv: toBase64(iv),
+        data: toBase64(encryptedData)
+      });
       const response = await fetch(api + "/submit", {
         method:"POST", credentials:"omit", cache:"no-store",
         headers:{"content-type":"application/json","authorization":"Bearer " + phoneToken},
