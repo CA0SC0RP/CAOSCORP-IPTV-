@@ -33,6 +33,12 @@
 - La cuenta web se guarda en `localStorage`, incluida la contraseña; no se debe trasladar ese almacenamiento sin protección a la app nativa.
 - No se usó una cuenta personal ni se probaron streams; no se ejecutó compilación ni prueba en Android TV.
 
+### Cambios de código iniciales en la rama de trabajo
+- Se eliminó de `src/ui/TiviMateLiveTvView.tsx` la función que inventaba programas y horarios.
+- La vista EPG ahora muestra “Información de programación no disponible” cuando no tiene registros; también se quitó la barra de progreso fija ficticia.
+- Esto es una corrección preventiva de la interfaz web actual. La integración de EPG real todavía no está conectada, por lo que la guía permanecerá vacía hasta implementarla.
+- No se ha ejecutado una compilación TypeScript ni una prueba visual; el cambio está pendiente de validación automática.
+
 ### Siguiente paso definido
 - Se confirmó que la EPG debe quedar vacía o mostrar “Información no disponible” si no hay datos reales; se prohíben horarios, títulos, duraciones y progreso inventados.
 - Se creó el plan técnico en `docs/PLAN_IMPLEMENTACION_ANDROID_TV.md`.
