@@ -9,7 +9,16 @@ interface TiviMateLiveTvViewProps {
   onFullscreenClean: (channel: Channel, index: number) => void;
 }
 
-// No synthetic EPG data: until a real guide is connected, schedule fields stay empty.
+// Only records supplied by a real EPG data source may populate this view.
+interface EpgProgram {
+  start: string;
+  end: string;
+  title: string;
+  duration?: string;
+  isCurrent?: boolean;
+  description?: string;
+  progress?: number;
+}
 
 export const TiviMateLiveTvView: React.FC<TiviMateLiveTvViewProps> = ({ onFullscreenClean }) => {
   const [channels] = useState<Channel[]>(ChannelRepository.channels);
@@ -32,8 +41,8 @@ export const TiviMateLiveTvView: React.FC<TiviMateLiveTvViewProps> = ({ onFullsc
   });
 
   const activeFocusChannel = filteredChannels[selectedChannelIndex] || filteredChannels[0] || channels[0];
-  const epgSchedule: never[] = [];
-  const currentProgram = undefined;
+  const epgSchedule: EpgProgram[] = [];
+  const currentProgram: EpgProgram | undefined = epgSchedule[0];
 
   // Initialize and keep playing channel continuous in PIP box
   useEffect(() => {
@@ -310,9 +319,23 @@ export const TiviMateLiveTvView: React.FC<TiviMateLiveTvViewProps> = ({ onFullsc
                 </div>
               ) : (
                 epgSchedule.map((slot, i) => (
-                  <div key={i} className="p-3.5 rounded-xl border bg-[#07080D] border-[#2A2F45] text-[#9AA3B5]">
-                    {/* Render only real guide records supplied by the EPG data layer. */}
-                    {JSON.stringify(slot)}
+                  <div
+                    key={`${slot.start}-${i}`}
+                    className={`p-3.5 rounded-xl border flex items-center justify-between transition-colors ${
+                      slot.isCurrent
+                        ? 'bg-[#101F2E] border-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.15)] text-white'
+                        : 'bg-[#07080D] border-[#2A2F45] text-[#9AA3B5]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      <span className={`text-xs font-mono font-bold w-24 shrink-0 ${slot.isCurrent ? 'text-[#00F0FF]' : ''}`}>
+                        {slot.start} - {slot.end}
+                      </span>
+                      <span className="text-sm font-mono font-bold truncate">{slot.title}</span>
+                    </div>
+                    {slot.duration && (
+                      <span className="text-xs font-mono shrink-0 pl-3">{slot.duration}</span>
+                    )}
                   </div>
                 ))
               )}
