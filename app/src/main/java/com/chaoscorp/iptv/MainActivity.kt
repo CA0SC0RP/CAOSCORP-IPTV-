@@ -27,6 +27,8 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -34,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 private val Background = Color(0xFF070A12)
 private val Panel = Color(0xFF101625)
@@ -63,8 +66,10 @@ private fun ChaosCorpApp() {
     var showConnection by rememberSaveable { mutableStateOf(false) }
     var server by rememberSaveable { mutableStateOf("") }
     var username by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var connecting by rememberSaveable { mutableStateOf(false) }
     var notice by rememberSaveable { mutableStateOf("Agrega una cuenta Xtream Codes para comenzar.") }
+    val coroutineScope = rememberCoroutineScope()
 
     Row(
         modifier = Modifier.fillMaxSize().background(Background).padding(22.dp),
@@ -101,10 +106,21 @@ private fun ChaosCorpApp() {
                     server, { server = it }, username, { username = it },
                     password, { password = it }, notice,
                     onConnect = {
-                        notice = when {
-                            server.isBlank() || username.isBlank() || password.isBlank() ->
-                                "Completa servidor, usuario y contraseña."
-                            else -> "Formulario validado. El cliente Xtream todavía no está conectado."
+                        if (server.isBlank() || username.isBlank() || password.isBlank()) {
+                            notice = "Completa servidor, usuario y contraseña."
+                        } else if (!connecting) {
+                            connecting = true
+                            notice = "Conectando con el proveedor..."
+                            coroutineScope.launch {
+                                when (val result = XtreamClient(server, username, password).authenticate()) {
+                                    is XtreamAuthResult.Success -> {
+                                        notice = "Conexión correcta. Cuenta: ${result.account.username} · Estado: ${result.account.status ?: "sin estado informado"}."
+                                        password = ""
+                                    }
+                                    is XtreamAuthResult.Failure -> notice = result.message
+                                }
+                                connecting = false
+                            }
                         }
                     },
                     onCancel = { showConnection = false }
@@ -198,7 +214,7 @@ private fun ConnectionPanel(
             singleLine = true, modifier = Modifier.fillMaxWidth(0.78f)
         )
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(onClick = onConnect, modifier = Modifier.height(50.dp)) { Text("Validar datos") }
+            Button(onClick = onConnect, modifier = Modifier.height(50.dp)) { Text(if (notice == "Conectando con el proveedor...") "Conectando..." else "Conectar") }
             Button(
                 onClick = onCancel, modifier = Modifier.height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Panel)
