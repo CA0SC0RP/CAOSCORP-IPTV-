@@ -137,3 +137,14 @@ No se debe codificar directamente la contraseña en el QR. Para que el teléfono
 - Aún hay que compilar el APK de estos cambios con GitHub Actions.
 - No se ha probado con las credenciales del usuario ni con su dispositivo.
 - Si la conexión sigue sin responder, se deberá revisar el resultado del workflow y, después, el comportamiento con una cuenta autorizada; no pedir ni publicar contraseñas en la bitácora.
+
+
+## 2026-10-27 — Plan de emparejamiento seguro por QR y revisión de compilación
+
+- El usuario confirmó que la entrada por QR es prioritaria porque la conexión manual ha fallado en varias pruebas y escribir las credenciales con el control remoto es incómodo.
+- Se añadió `docs/DISEÑO_EMParejamiento_QR.md` como diseño de implementación segura: página HTTPS, token de un solo uso y expiración breve, cifrado en el navegador con clave pública efímera del televisor, transferencia cifrada y autenticación Xtream real en el dispositivo.
+- El QR visual temporal existente no es funcional y no debe presentarse como implementado. No debe incluir las credenciales directamente.
+- Bloqueo identificado: hace falta desplegar un servicio HTTPS de emparejamiento y configurar su URL. El repositorio todavía no contiene un servicio desplegado; no se inventará una URL.
+- Se consultó el workflow `40572621539`: la compilación falló al resolver el plugin Gradle `org.jetbrains.kotlin.android:2.0.21`, antes de compilar el código de la interfaz. No se generó APK en ese intento.
+- Se inició una repetición del job fallido para distinguir un fallo transitorio de resolución de dependencias. El resultado de la repetición queda pendiente.
+- No se cambió `main`; el trabajo continúa en `planning/xtream-epg-spec`.
