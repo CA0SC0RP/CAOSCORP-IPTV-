@@ -14,19 +14,28 @@
 ### Auditoría inicial realizada
 - Se leyó `README.md`: todavía menciona soporte M3U/M3U8, por lo que la documentación actual contradice la decisión de producto.
 - Se leyó `src/ui/TiviMateLiveTvView.tsx`: contiene una función `generateEpgSchedule` que crea nombres y horarios de ejemplo. Debe eliminarse o sustituirse cuando se implemente la EPG real.
-- Se leyó `src/data/xtreamParser.ts`: contiene un parser de credenciales Xtream; todavía falta auditar el flujo completo de conexión y los endpoints EPG disponibles.
-- Se leyó `package.json`: el proyecto actual está configurado como aplicación web React/TypeScript con servidor Node/Express. La arquitectura Android nativa debe revisarse en la auditoría antes de decidir la estrategia de migración.
-- Esta revisión fue parcial; no representa una auditoría completa ni una prueba de compilación.
+- Se leyó `src/data/xtreamParser.ts`: contiene un parser de credenciales Xtream; todavía falta auditar el flujo completo y los endpoints EPG disponibles.
+- Se leyó `package.json`: el proyecto actual está configurado como aplicación web React/TypeScript con servidor Node/Express. La arquitectura Android nativa debe revisarse antes de decidir la estrategia de migración.
+- Se revisaron también `server.ts`, `src/data/iptvClient.ts`, `src/data/accountStore.ts`, `src/ui/CleanFullscreenPlayer.tsx`, `src/ui/CosmicLiveTvView.tsx`, `src/data/channelRepository.ts`, `src/ui/InteractiveMoviesView.tsx`, `src/ui/InteractiveSeriesView.tsx`, `src/ui/AdvancedMediaControls.tsx` y `build.gradle.kts`.
+- Los hallazgos técnicos y el plan de corrección están en `docs/AUDITORIA_CONEXION_REPRODUCTOR.md`.
 
 ### Cambios realizados
 - Se creó la rama de planificación `planning/xtream-epg-spec` desde `main`.
 - Se añadió la especificación del producto en `docs/ESPECIFICACION_PRODUCTO.md`.
 - Se añadió esta bitácora en `docs/BITACORA_PROYECTO.md`.
+- Se añadió `docs/AUDITORIA_CONEXION_REPRODUCTOR.md` con los hallazgos de la revisión estática.
 - No se modificó código de la aplicación y no se modificó `main`.
 
+### Resultados y limitaciones de la auditoría
+- La conexión Xtream tiene un flujo parcial para autenticar y cargar canales, películas y series; faltan pruebas reales y un manejo uniforme de fallos/tiempos de espera.
+- El reproductor revisado es web (`video` + `hls.js)); no es evidencia de que exista un reproductor Android nativo.
+- Hay programación EPG ficticia y valores de metadatos por defecto que deben eliminarse para cumplir el requisito de datos reales.
+- La cuenta web se guarda en `localStorage`, incluida la contraseña; no se debe trasladar ese almacenamiento sin protección a la app nativa.
+- No se usó una cuenta personal ni se probaron streams; no se ejecutó compilación ni prueba en Android TV.
+
 ### Pendiente
-1. Completar auditoría del árbol y del flujo Xtream/EPG.
-2. Verificar el formato XMLTV, identificadores, actualización, tamaño y condiciones de uso de IPTV-EPG.org.
-3. Definir arquitectura objetivo de Android TV y estrategia de reutilización del diseño actual.
-4. Implementar en fases, ejecutar pruebas y documentar sus resultados.
-5. Revisar los cambios de la rama antes de cualquier integración a `main`.
+1. Definir arquitectura nativa Kotlin/Android TV con Media3/ExoPlayer.
+2. Probar autenticación Xtream, carga parcial, timeout, formatos y reproducción con una cuenta de prueba autorizada.
+3. Eliminar los datos ficticios de EPG y metadatos.
+4. Verificar la fuente XMLTV externa antes de integrarla.
+5. Revisar los cambios de esta rama antes de cualquier integración a `main`.
